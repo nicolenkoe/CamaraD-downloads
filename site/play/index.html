@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=yes"/>
+<link rel="icon" href="./boat-preview.svg"><title>CamaraD Speed V5 · 3D</title>
+<style>
+:root{color-scheme:dark;--glass:rgba(9,28,41,.68);--line:rgba(255,255,255,.16);--gold:#f4c66c}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#a6d0dd;color:white;touch-action:none}canvas{display:block;width:100%;height:100%;touch-action:none}
+#ui{pointer-events:none;position:fixed;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(14px,2.5vw,30px)}
+.header{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.brand{font-size:clamp(19px,2.6vw,31px);font-weight:850;letter-spacing:.075em;text-shadow:0 2px 14px #17334b8c}.brand small{display:block;font-size:10px;letter-spacing:.23em;font-weight:700;color:#fff9;margin-top:3px}
+.mission{background:var(--glass);border:1px solid var(--line);box-shadow:0 12px 35px #001a2420;backdrop-filter:blur(15px);padding:13px 17px;border-radius:17px;max-width:390px;text-align:right}.mission b{color:var(--gold);font-size:12px;text-transform:uppercase;letter-spacing:.15em}.mission p{margin:5px 0 0;font-size:clamp(13px,1.5vw,17px);line-height:1.35}
+.bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}.panel{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:7px}.label{font-size:12px;font-weight:700;text-shadow:0 2px 8px #052430b0;letter-spacing:.04em}.pad{width:clamp(112px,16vw,165px);height:clamp(112px,16vw,165px);border-radius:50%;background:radial-gradient(circle at 35% 30%,#6c99a6a1,#092938c9);border:2px solid #ffffff5d;box-shadow:inset 0 3px 18px #fff2,0 9px 35px #001e2b60;position:relative;touch-action:none;user-select:none}.pad:before,.pad:after{content:'';position:absolute;background:#e4f8f84d;left:50%;top:16%;width:1px;height:68%;transform:translateX(-50%)}.pad:after{transform:translateX(-50%) rotate(90deg)}.thumb{position:absolute;left:50%;top:50%;width:39%;height:39%;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle at 32% 26%,#eef7f7,#8eaab5 30%,#213c49 74%);box-shadow:inset 0 2px 6px #fff7,0 4px 15px #0008;border:2px solid #ffffff80}
+.info{align-self:flex-end;display:flex;flex-direction:column;align-items:center;gap:7px;padding-bottom:2px}.stat{background:var(--glass);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:13px;padding:10px 15px;text-align:center;min-width:148px;font-weight:650;font-size:14px}.stat span{color:var(--gold)}button{pointer-events:auto;border:1px solid #ffffff50;background:var(--glass);color:white;border-radius:12px;padding:9px 14px;font-weight:700;cursor:pointer;backdrop-filter:blur(10px)}button:hover{background:#244f65e8}.hint{font-size:11px;text-align:center;text-shadow:0 2px 7px #001c24;opacity:.94}.finish{pointer-events:auto;position:fixed;left:50%;top:47%;transform:translate(-50%,-50%);width:min(410px,90vw);padding:26px;border:1px solid #ffffff52;border-radius:24px;background:#0c3041ee;box-shadow:0 30px 100px #041e2a88;text-align:center;display:none}.finish h2{margin:2px 0 10px;font-size:27px}.finish p{line-height:1.5}.finish button{background:#e7b85c;color:#172c35;border:0;margin-top:9px;padding:12px 24px}.finish.show{display:block}
+@media(max-width:620px){#ui{padding:13px}.header{gap:7px}.mission{max-width:60%;padding:10px 12px}.mission p{font-size:12px}.brand{font-size:17px}.brand small{font-size:8px;letter-spacing:.1em}.bottom{gap:5px}.pad{width:113px;height:113px}.label{font-size:10px}.info{position:absolute;bottom:155px;left:50%;transform:translateX(-50%)}.stat{padding:7px 10px;min-width:125px;font-size:12px}.hint{display:none}}
+
+.loading{position:fixed;inset:0;z-index:20;background:#092533d9;display:flex;align-items:center;justify-content:center;padding:15px;pointer-events:auto}
+.loading.hidden{display:none}.loadcard{width:min(570px,96vw);max-height:95vh;overflow:auto;background:#12394a;border:1px solid #ffffff55;border-radius:22px;padding:20px;text-align:center;box-shadow:0 20px 80px #0009}
+.loadcard h2{margin:0 0 6px}.loadcard p{font-size:14px;line-height:1.4}
+.baits{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+.bait{background:#24546a;border:2px solid #7ba7b4;border-radius:15px;padding:12px 10px;min-width:125px;cursor:grab;touch-action:none;user-select:none;font-size:14px}
+.bait strong{display:block;font-size:28px;margin-bottom:4px}
+.hopper{border:3px dashed #d9b56c;border-radius:18px;min-height:115px;display:flex;align-items:center;justify-content:center;flex-direction:column;background:#172c32;margin:12px auto;max-width:350px}
+.hopper.over{background:#476343}.hopper .contents{font-size:14px;color:#f5d08a;margin-top:6px}
+.loadcard button{background:#f2c66f;color:#132b34;border:0;padding:12px 25px}.loadcard button:disabled{opacity:.35;cursor:not-allowed}
+.dragghost{position:fixed;z-index:30;pointer-events:none;font-size:35px;transform:translate(-50%,-50%)}
+.boatload{padding:12px 8px;background:#0b2d3c;border-radius:18px;margin:12px 0}.bow{font-size:12px;color:#f2c66f}.hulls{display:flex;align-items:stretch;justify-content:center;gap:5px;margin:8px auto;max-width:490px}.hull{flex:1;min-width:0;background:linear-gradient(135deg,#bec7c9,#65747a);padding:8px 5px;border-radius:42% 42% 15px 15px / 22% 22% 15px 15px;border:3px solid #18262b}.centerHull{align-self:center;width:75px;color:#ffdb8c;font-size:12px;font-weight:900;letter-spacing:.08em}.hopper{min-height:115px;margin:0;border:2px dashed #e5b75c;background:#17333a;border-radius:30% 30% 10px 10px / 20% 20% 10px 10px;padding:8px 4px;cursor:pointer}.hopper b{font-size:11px}.hopper .contents{font-size:12px;line-height:1.5;max-height:90px;overflow:auto}.hopper.over{background:#3c6654}.bait.selected{outline:3px solid #f6c66b}.boatload small{display:block;margin-top:10px;color:#cde0e6}.cruiseReadout{font-size:11px;color:#f6d17c;font-weight:800}
+@media(max-width:620px){.centerHull{width:45px;font-size:10px}.hopper b{font-size:9px}.hulls{gap:3px}.hull{padding:5px 2px}.boatload{padding:8px 3px}}
+.choiceButtons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:20px 0}.choiceButtons button{padding:17px 20px;background:#f1c76b;border:0;border-radius:15px;font-weight:800;color:#18323b;cursor:pointer}.backChoice{background:transparent;border:1px solid #8eb5bf;color:#e6f2f4;border-radius:9px;padding:7px 12px;cursor:pointer}.singleHull{margin:8px auto;max-width:230px}.singleBody{background:linear-gradient(130deg,#bdc7ca,#64747c);border:4px solid #18262b;border-radius:42% 42% 18px 18% / 24% 24% 14px 14px;padding:15px 18px}.singleLogo{font-weight:900;color:#203a45;margin-top:8px}.singleBody .hopper{min-height:110px}.baitStep[hidden],#baitStep[hidden],#choiceStep[hidden],#twoHull[hidden],#singleHull[hidden]{display:none!important}
+.modelRefs{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:12px auto}.modelRef{width:min(42%,210px);background:#153744;border:1px solid #54717a;border-radius:12px;padding:9px;color:#fff;font-size:13px}.modelRef img{width:100%;height:105px;object-fit:contain}.modelRef small{display:block;color:#c6d4d9;font-size:11px}.modelRef button{margin-top:7px;width:100%;padding:9px;background:#f1c76b;border:0;border-radius:8px;font-weight:bold;cursor:pointer}.reference{margin:8px auto;max-width:380px}.reference img{max-width:100%;max-height:140px;object-fit:contain}.reference p{font-size:11px;color:#b7c9d2} 
+.remoteExtras{pointer-events:auto;position:fixed;left:50%;top:12px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;max-width:95vw;padding:9px 13px;border:1px solid #ffffff44;border-radius:17px;background:#092332dd;backdrop-filter:blur(10px);box-shadow:0 6px 25px #0019;z-index:2}
+.remoteExtras .dialBox{width:115px;text-align:center;font-size:11px;font-weight:700}
+.remoteExtras .dial{width:39px;height:39px;border-radius:50%;margin:0 auto 4px;background:radial-gradient(circle at 32% 26%,#b8c8cd,#354955 65%,#13252d);border:2px solid #98aab1;position:relative;box-shadow:0 3px 9px #0009}
+.remoteExtras .dial:after{content:'';position:absolute;width:3px;height:13px;background:#f6cf75;border-radius:2px;top:4px;left:calc(50% - 1px);transform-origin:1px 15px;transform:rotate(var(--angle,-135deg))}
+.remoteExtras input{width:102px;accent-color:#f4c66c;cursor:pointer;display:block;margin:3px auto 0}
+.switchBox{min-width:83px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:800;text-align:center;color:#e5e9eb}
+.toggleSwitch{position:relative;width:43px;height:43px;border-radius:50%;border:2px solid #8599a3;background:radial-gradient(circle,#273e49 15%,#142934 65%,#0a1a22);cursor:pointer;box-shadow:inset 0 2px 5px #000b,0 2px 6px #0009}
+.toggleSwitch:before{content:'';position:absolute;left:calc(50% - 4px);top:5px;width:8px;height:26px;background:linear-gradient(90deg,#8c9da5,#edf3f4 50%,#7d8c94);border:1px solid #2d404b;border-radius:5px;transform-origin:50% 75%;transform:rotate(-27deg);box-shadow:1px 2px 4px #000a;transition:transform .18s}
+.toggleSwitch:after{content:'';position:absolute;width:5px;height:5px;bottom:5px;left:calc(50% - 2.5px);border-radius:50%;background:#526d76}
+.toggleSwitch:disabled:before{transform:rotate(27deg)}
+.toggleSwitch:disabled{cursor:default;border-color:#bca86d}
+.toggleSwitch[hidden],.switchBox span[hidden]{display:none!important}
+@media(max-width:740px){.remoteExtras{top:65px;padding:5px 6px;gap:3px}.remoteExtras .dialBox{width:75px;font-size:9px}.remoteExtras input{width:70px}.remoteExtras .dial{width:29px;height:29px}.switchBox{min-width:55px;font-size:8px}.toggleSwitch{width:32px;height:32px}.toggleSwitch:before{height:20px;top:3px}}
+
+.gpsPanel{pointer-events:auto;position:fixed;right:15px;top:125px;width:210px;padding:10px;background:#082b3cdb;border:1px solid #ffffff55;border-radius:14px;backdrop-filter:blur(10px);z-index:3;font-size:12px}
+.gpsPanel .gpsTitle{font-weight:800;color:#f4c66c;margin-bottom:6px}.gpsRow{display:flex;align-items:center;justify-content:space-between;gap:4px;margin:5px 0}.gpsRow button{padding:6px 9px;border-radius:8px;font-size:12px}.gpsRow button.primary{background:#e6b75f;color:#172f37}.gpsRow button:disabled{opacity:.45}.gpsMap{width:100%;height:140px;border-radius:8px;border:1px solid #86b5ae70;background:#174858;touch-action:auto}.gpsStatus{font-size:11px;color:#d9e9e9;min-height:26px;margin-top:5px;line-height:1.3}.gpsNumber{font-size:17px;font-weight:900;color:#fff0bd;min-width:40px;text-align:center}
+@media(max-width:750px){.gpsPanel{right:8px;top:153px;width:155px;padding:7px;font-size:10px}.gpsMap{height:94px}.gpsRow button{padding:5px 6px;font-size:10px}.gpsNumber{font-size:14px}.gpsStatus{font-size:9px}}
+.boatload{background-image:linear-gradient(#09243288,#092432aa),none;background-position:center 48%;background-size:cover;border:1px solid #f0bd7355}
+.boatload .hull{background:#283941bb}
+@media(max-height:760px){.loadcard{padding:10px;max-height:98dvh}.loadcard p{margin:5px}.reference{display:none}.boatload{margin:5px 0;padding:5px}.hopper{min-height:72px}.baits{margin:5px auto}}
+
+/* V26: настоящий интерактивный кораблик вместо отдельных квадратных бункеров */
+.loading{background:radial-gradient(circle at 50% 30%,#1c5360,#05161c 80%)}
+.loadcard{width:min(1180px,98vw);height:min(800px,98dvh);max-height:98dvh;overflow:hidden;padding:12px 16px;display:flex;flex-direction:column;justify-content:center;background:#071a22ee;border:1px solid #647985;border-radius:16px}
+#baitStep{height:100%;min-height:0;display:flex;flex-direction:column}
+#baitStep[hidden]{display:none!important}
+.loadTop{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:42px;font-size:clamp(17px,2.7vw,29px);color:#ffcf6a}
+.loadTop #choiceSummary{font-size:12px;color:#b4d0d7;font-weight:normal}
+.loadGrid{display:grid;grid-template-columns:minmax(130px,1fr) minmax(220px,1.85fr) minmax(125px,.95fr);gap:12px;flex:1;min-height:0;align-items:stretch}
+.loadLeft{display:flex;flex-direction:column;justify-content:center;gap:8px;min-width:0}.loadLeft small{font-size:11px;color:#adc6ca;line-height:1.3}
+#baitStep .baits{display:flex;flex-direction:column;gap:12px;margin:0;padding:0}
+#baitStep .bait{display:flex;align-items:center;gap:10px;padding:10px 12px;min-height:65px;font-size:clamp(12px,1.8vw,18px);border:1px solid #728087;background:#0a202bcf;border-radius:15px;cursor:grab;touch-action:none}
+#baitStep .bait strong{font-size:30px}
+#baitStep .bait.selected{border-color:#ffcf50;box-shadow:0 0 14px #e4a73d77;background:#2b3227}
+#baitStep .boatload{position:relative;display:block;margin:0;padding:0;min-height:0;max-width:none;width:100%;height:100%;background:transparent;border:0;overflow:hidden}
+#baitStep .boatPhoto{position:absolute;inset:0;background-image:none;background-size:contain;background-position:center;background-repeat:no-repeat;pointer-events:none}
+#baitStep .bow{display:none}
+#baitStep .hulls{position:absolute;inset:0;display:block!important;background:transparent;pointer-events:none}
+#baitStep .hull{position:absolute;top:32.8%;height:36%;width:23%;padding:0;margin:0;background:transparent!important;border:0;pointer-events:none}
+#baitStep .hull:nth-child(1){left:21%}#baitStep .hull:nth-child(3){left:57.7%}
+#baitStep .centerHull{display:none}
+#baitStep .hopper{width:100%;height:100%;min-height:0;position:relative;border:2px solid #f2bd5977;border-radius:10px;background:#03060933;pointer-events:auto;cursor:pointer;padding:0;overflow:hidden}
+#baitStep .hopper.over{border-color:#ffe070;background:#ffdc4e33}
+#baitStep .hopper .contents{position:absolute;bottom:0;left:0;right:0;z-index:3;color:#fff;background:#050c10c9;font-size:clamp(9px,1.4vw,13px);line-height:1.25;padding:5px;max-height:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#baitStep .foodLayer{position:absolute;inset:3px 3px 23px;pointer-events:none;overflow:hidden}
+#baitStep .foodDot{position:absolute;width:12%;aspect-ratio:1;border-radius:50%;box-shadow:inset -2px -2px 3px #0006,0 1px 2px #0008}
+#baitStep #singleHull{position:absolute;inset:0;margin:0;max-width:none;background:transparent;pointer-events:none}
+#baitStep #singleHull[hidden],#baitStep #twoHull[hidden]{display:none!important}
+#baitStep .singleBody{position:absolute;left:33%;top:34%;width:34%;height:34%;background:transparent;border:0;padding:0;pointer-events:none}
+#baitStep .singleBody .hopper{pointer-events:auto}
+#baitStep .singleLogo{display:none}
+.loadRight{display:flex;align-items:center;min-width:0}.loadSummary{width:100%;border:1px solid #738891;background:#091c25dc;border-radius:14px;padding:12px;line-height:1.8}.loadSummary h3{margin:0 0 8px;color:#fff}.loadSummary button{margin-top:14px;padding:10px;background:#233e49;color:#fff;border:1px solid #647a80;border-radius:10px;cursor:pointer;width:100%}
+.loadActions{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:8px;min-height:53px}.loadActions button{border-radius:12px;padding:10px 16px;font-size:clamp(13px,2vw,18px);cursor:pointer}.loadActions #start{background:#ffc42f;color:#111b20;border:0;font-weight:900}.loadActions #start:disabled{opacity:.48;cursor:not-allowed}
+@media(max-width:680px){.loadcard{width:99vw;height:98dvh;padding:6px}.loadGrid{grid-template-columns:23% 57% 20%;gap:2px}.loadTop{min-height:33px}.loadTop #choiceSummary{display:none}#baitStep .bait{min-height:46px;padding:5px 2px;gap:2px;flex-direction:column;text-align:center;font-size:10px}#baitStep .bait strong{font-size:19px}.loadLeft small{display:none}.loadSummary{padding:4px;font-size:10px}.loadSummary h3{font-size:12px}.loadSummary button{font-size:9px;padding:5px}.loadActions{min-height:43px;padding-top:3px}.loadActions button{padding:8px}.loadcard h2{font-size:18px}}
+
+/* V36: освободить пространство между джойстиками на iPhone */
+.bottom{position:relative}
+.bottom>.info{position:fixed;left:max(10px,env(safe-area-inset-left));top:calc(8px + env(safe-area-inset-top));bottom:auto;z-index:9;align-items:flex-start;gap:5px;padding:0;pointer-events:none}
+.bottom>.info button,.bottom>.info .stat{pointer-events:auto}
+#backToBait{order:0;background:rgba(9,28,41,.88);border:1px solid #ffffff55;min-width:80px;font-weight:800}
+#reloadBait{order:2;font-size:11px;padding:7px 9px;max-width:145px;white-space:normal;line-height:1.2}
+#reset{order:3;font-size:10px;padding:6px 8px;opacity:.8}
+.bottom>.info .stat{order:1;font-size:11px;padding:6px 9px}
+.bottom>.info .hint{display:none!important}
+@media(max-width:750px){
+ .bottom>.info{top:calc(7px + env(safe-area-inset-top));left:calc(7px + env(safe-area-inset-left));gap:4px}
+ #backToBait{padding:8px 10px;font-size:12px}
+ #reloadBait{font-size:10px;padding:6px 8px;max-width:115px}
+ #reset{font-size:9px;padding:5px 7px}
+ .bottom>.info .stat{font-size:10px;padding:5px 7px}
+ .header .brand{margin-left:125px;font-size:13px}
+ .header .brand small{font-size:7px}
+}
+
+#arrivalNotice{position:absolute;top:65px;left:50%;transform:translateX(-50%);z-index:42;display:none;max-width:min(88vw,380px);padding:12px 17px;border-radius:14px;background:rgba(9,25,30,.91);border:1px solid #ffd075;color:#fff;text-align:center;box-shadow:0 8px 24px #0007;pointer-events:none}
+#arrivalNotice.show{display:block}
+#arrivalNotice b{display:block;color:#ffd075;font-size:17px}
+#arrivalNotice span{display:block;margin-top:4px;font-size:13px}
+@media(max-width:600px){#arrivalNotice{top:62px;max-width:75vw;padding:9px 12px}#arrivalNotice b{font-size:14px}}
+
+/* V43: loading-stage recessed black hopper interiors and visible feed grains */
+#baitStep .hopper{background:radial-gradient(ellipse at 50% 42%,#12191b 0%,#030506 72%);border:5px solid #151a21;box-shadow:inset 0 9px 20px #000,0 0 0 2px #515b63,0 8px 12px #0007;overflow:hidden;position:relative;isolation:isolate}
+#baitStep .hopper .foodLayer{position:absolute;inset:12% 7% 12%;z-index:1;pointer-events:none}
+#baitStep .hopper .contents{position:relative;z-index:2;align-self:flex-end;background:#0a1219d9;border-radius:10px;padding:3px 8px;color:#fff;pointer-events:none}
+#baitStep .hopper .foodDot{width:9%;box-shadow:inset -2px -2px 3px #0008,0 2px 3px #0008}
+#baitStep .hopper.over{border-color:#f5c76e;box-shadow:inset 0 9px 20px #000,0 0 0 3px #ffd66a,0 8px 12px #0007}
+</style>
+<style>
+#autoDistance{display:none;position:absolute;top:12px;right:12px;z-index:28;min-width:104px;padding:9px 12px;border-radius:13px;background:rgba(9,23,30,.82);border:1px solid rgba(255,213,123,.5);color:#fff;text-align:center;pointer-events:none;box-shadow:0 4px 15px #0005;font:600 12px system-ui,sans-serif;}
+#autoDistance.visible{display:flex;flex-direction:column;gap:1px}
+#autoDistance strong{font-size:25px;line-height:1.15;color:#ffd67c;font-variant-numeric:tabular-nums}
+#autoDistance small{font-size:11px;color:#e4e9e8}
+@media(max-width:600px){#autoDistance{top:8px;right:8px;padding:6px 9px;min-width:86px}#autoDistance strong{font-size:21px}}
+
+/* V42: фирменная надпись под пультом, а не в левом верхнем углу */
+.header .brand{position:fixed!important;left:50%!important;top:132px!important;transform:translateX(-50%);margin:0!important;z-index:3;pointer-events:none;white-space:nowrap;font-family:Montserrat,Arial,sans-serif;font-size:clamp(25px,3vw,43px)!important;font-weight:900;letter-spacing:.015em;color:#fff;text-shadow:0 2px 9px #071a23,0 1px 2px #071a23}
+@media(max-width:740px){.header .brand{top:155px!important;font-size:clamp(21px,5vw,31px)!important}}
+</style><style>
+/* V46: оформление по утверждённому визуальному образцу */
+:root{--glass:rgba(5,25,36,.91);--line:rgba(188,220,225,.32);--gold:#ffcb64}
+.remoteExtras,.gpsPanel,.mission,.stat,#premiumTelemetry{background:linear-gradient(145deg,rgba(6,30,42,.96),rgba(5,22,32,.94))!important;border:1px solid rgba(183,218,222,.32)!important;box-shadow:0 10px 28px rgba(0,0,0,.36),inset 0 1px rgba(255,255,255,.08)!important;backdrop-filter:blur(16px)}
+.remoteExtras{border-radius:20px;top:10px;padding:12px 22px;gap:20px}
+.gpsPanel{border-radius:20px!important}
+.gpsTitle,.mission b{color:#ffcb64!important;letter-spacing:.11em}
+button{border-radius:12px;border-color:#7d9ca58a;background:rgba(6,29,40,.88)}
+button.primary,#gpsSave{background:linear-gradient(#ffda85,#f6b84c)!important;color:#172b31!important;border:0}
+.brand{position:fixed;top:clamp(128px,17vh,166px);left:50%;transform:translateX(-50%);font-size:clamp(28px,3.5vw,52px)!important;letter-spacing:.015em!important;font-weight:900!important;white-space:nowrap;text-shadow:0 4px 15px #000a,0 1px 2px #fff7;pointer-events:none}
+.header{justify-content:flex-start}
+.mission{position:fixed;left:12px;top:54px;width:min(335px,24vw);text-align:left;max-width:none;padding:13px 16px}
+.mission p{font-size:13px}
+.info{position:fixed!important;left:10px!important;top:260px!important;bottom:auto!important;transform:none!important;align-items:stretch!important;z-index:4}
+.info button{font-size:12px;text-align:left;padding:10px}
+.info .stat{display:none}
+#backToBait{position:fixed;top:7px;left:10px;width:auto;padding:11px 16px;font-size:14px}
+.pad{width:clamp(120px,12vw,190px);height:clamp(120px,12vw,190px);background:radial-gradient(circle at 36% 30%,#8ab2b8b8,#234958ec 56%,#08212ce9)!important;border:2px solid #b9d5d9a6;box-shadow:inset 0 3px 18px #fff3,0 7px 24px #001e2bc9}
+.thumb{background:radial-gradient(circle at 30% 20%,#e9fbff,#9ab8c1 37%,#193c4d 78%)}
+.bottom{padding-bottom:70px}
+#premiumTelemetry{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);width:min(710px,57vw);height:68px;display:flex;justify-content:space-around;align-items:center;border-radius:17px;z-index:4;pointer-events:none}
+.teleItem{text-align:center;flex:1;padding:3px 10px}
+.teleItem+.teleItem{border-left:1px solid #b1c9cc55}
+.teleItem small{display:block;font-size:10px;color:#d7e5e7;letter-spacing:.055em}
+.teleItem strong{display:block;font-size:clamp(16px,2vw,28px);font-weight:850;color:#fff;font-variant-numeric:tabular-nums}
+.teleItem:nth-child(2) strong{color:#5de16a}
+#autoDistance{top:128px;right:260px;background:#082333ef}
+.gpsMap{border-radius:12px}
+.loadcard{background:linear-gradient(150deg,#092d3b,#102d34);border-color:#a7d0d255}
+.boatload{background:linear-gradient(145deg,#0b3442,#153d43)}
+.hull,.singleBody{background:linear-gradient(145deg,#29b85c,#067a36)!important;border-color:#053c25!important}
+.hopper{background:#03080a!important;border:3px solid #171c22!important;box-shadow:inset 0 6px 17px #000!important}
+.centerHull{background:#159b45;border-radius:10px}
+@media(max-width:900px){
+ .mission{width:240px;top:52px;padding:9px 11px}
+ .mission p{font-size:11px}
+ .info{top:210px!important}
+ .brand{top:125px;font-size:30px!important}
+ .remoteExtras{gap:5px;padding:8px 9px}
+ .remoteExtras .dialBox{width:77px}
+ .remoteExtras input{width:72px}
+ .switchBox{min-width:62px}
+ #premiumTelemetry{width:50vw;height:58px;bottom:7px}
+ .teleItem small{font-size:8px}
+ .teleItem strong{font-size:15px}
+ .bottom{padding-bottom:50px}
+}
+@media(max-width:620px){
+ .mission{display:none}
+ .brand{top:108px;font-size:26px!important}
+ .info{top:155px!important;left:6px!important}
+ .info button{padding:6px 7px;font-size:10px;max-width:110px}
+ .remoteExtras{max-width:92vw;top:8px}
+ #premiumTelemetry{width:60vw;height:43px;bottom:3px}
+ .teleItem small{font-size:7px}
+ .teleItem strong{font-size:12px}
+ .bottom{padding-bottom:46px}
+ .pad{width:105px;height:105px}
+ .label{font-size:9px}
+}
+</style><style>
+/* V47: реальная перекомпоновка по утверждённому референсу */
+#mainNav{position:fixed;z-index:20;top:62px;left:10px;display:flex;flex-direction:column;gap:5px;width:132px}
+#mainNav button{width:100%;text-align:left;padding:10px 11px;color:#fff;font-size:12px;font-weight:750;background:linear-gradient(125deg,#092536,#041923);border:1px solid #6c9197;border-radius:12px;box-shadow:0 5px 12px #0007}
+#mainNav button:active{background:#28546a}
+.header{pointer-events:none}.header .mission{pointer-events:auto}
+.mission{left:153px!important;top:9px!important;width:350px!important;min-height:211px;box-sizing:border-box;padding:13px 17px!important;text-align:left!important;border-radius:20px!important;display:block!important}
+.mission #step{font-size:16px;display:block;text-align:center;color:#ffcc64!important;letter-spacing:.11em}
+.mission #instruction{font-size:12px;margin:8px 0;color:#d6e8eb}
+.pilotRows{display:grid;gap:6px;font-size:13px;color:#e7f1f2}.pilotRows div{display:flex;justify-content:space-between;gap:9px}.pilotRows strong{color:#ffcc64;font-weight:800}
+.pilotStages{display:flex;justify-content:space-between;gap:2px;font-size:9px;color:#c7dadd;margin-top:15px}.pilotProgress{height:7px;background:#41525a;border-radius:10px;margin-top:7px;overflow:hidden}.pilotProgress i{display:block;width:0%;height:100%;background:linear-gradient(90deg,#3cdd5c,#ffd15d);border-radius:10px;transition:width .3s}
+.remoteExtras{width:620px!important;max-width:calc(100vw - 720px);min-width:450px;left:50%!important;transform:translateX(-50%)!important;top:8px!important;height:112px;box-sizing:border-box;justify-content:space-around;border-radius:19px!important}
+.remoteExtras .switchBox{min-width:80px}.remoteExtras .toggleSwitch{width:56px;height:56px}.remoteExtras .dial{width:48px;height:48px}.remoteExtras .dialBox{font-size:12px}
+.brand{top:135px!important;font-size:clamp(32px,3.4vw,52px)!important;letter-spacing:.025em!important;color:#fff!important}
+.gpsPanel{top:10px!important;right:10px!important;width:306px!important;padding:14px!important;border-radius:21px!important;box-sizing:border-box}
+.gpsPanel .gpsMap{width:100%!important;height:195px!important;display:block;background:#0a3640;border:2px solid #7d9c68;border-radius:14px}
+.gpsPanel .gpsRow{margin:9px 0}.gpsPanel .gpsTitle{font-size:15px!important}.gpsPanel .gpsNumber{font-size:26px!important}
+.info{display:none!important}
+#premiumTelemetry{width:min(860px,65vw)!important;bottom:8px!important;height:77px!important;border-radius:18px!important}
+#premiumTelemetry .teleItem strong{font-size:24px}
+#premiumTelemetry .teleItem small{font-size:11px}
+.bottom{bottom:0!important;left:0;right:0;display:flex;justify-content:space-between;padding:0 25px 75px!important;pointer-events:none}.bottom .panel{pointer-events:auto}
+.pad{width:clamp(130px,13vw,188px)!important;height:clamp(130px,13vw,188px)!important}
+#backToBait{top:8px!important;left:10px!important;z-index:30}
+#autoDistance{right:330px!important;top:230px!important}
+@media(max-width:1350px){.remoteExtras{min-width:360px;width:450px!important;max-width:calc(100vw - 590px)}.mission{left:128px!important;width:290px!important}.gpsPanel{width:255px!important}.gpsPanel .gpsMap{height:160px!important}#mainNav{width:112px}.brand{top:126px!important}}
+@media(max-width:1050px){.mission{top:130px!important;left:9px!important;width:240px!important;min-height:0;padding:10px!important}.remoteExtras{max-width:calc(100vw - 280px);min-width:300px;left:50%!important}.gpsPanel{width:220px!important}.brand{top:124px!important;left:55%!important}.pilotStages{font-size:7px}#mainNav{top:54px;width:104px}#mainNav button{font-size:10px;padding:7px}.gpsPanel .gpsMap{height:120px!important}}
+@media(max-width:700px){.mission{display:none!important}#mainNav{top:50px;width:90px}#mainNav button{padding:5px;font-size:9px}.remoteExtras{left:50%!important;min-width:0;width:70vw!important;max-width:70vw;top:6px!important;height:86px}.remoteExtras .toggleSwitch{width:36px;height:36px}.remoteExtras .dial{width:30px;height:30px}.remoteExtras .switchBox{min-width:42px;font-size:8px}.remoteExtras .dialBox{font-size:8px}.remoteExtras input{width:42px}.brand{top:100px!important;font-size:26px!important}.gpsPanel{top:116px!important;width:170px!important;padding:8px!important}.gpsPanel .gpsMap{height:105px!important}#premiumTelemetry{width:65vw!important;height:47px!important}.teleItem{padding:2px 3px!important}#premiumTelemetry .teleItem strong{font-size:12px}#premiumTelemetry .teleItem small{font-size:7px}.bottom{padding:0 6px 45px!important}.pad{width:105px!important;height:105px!important}}
+</style>  <script type="module" crossorigin src="./assets/index-B1bBZNia.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BHBeuk_2.css">
+</head>
+<body>
+<canvas id="scene" aria-label="Виртуальное озеро и радиоуправляемый прикормочный кораблик"></canvas>
+<div id="ui">
+ <div class="header"><div class="brand" aria-label="CamaraD">CamaraD</div><div class="mission"><b id="step">АВТОПИЛОТ</b><p id="instruction">Выберите GPS-точку и нажмите «Отправить»</p><div class="pilotRows"><div>◎ Цель: <strong id="pilotTarget">Ручное управление</strong></div><div>◉ Этап: <strong id="pilotStage">Ожидание</strong></div><div>◷ До цели: <strong id="pilotDistance">— м</strong></div><div>◉ Скорость: <strong id="pilotSpeed">0%</strong></div></div><div class="pilotStages"><span>СТАРТ</span><span>РАЗГОН</span><span>КРЕЙСЕР</span><span>ТОРМОЖ.</span><span>ЦЕЛЬ</span></div><div class="pilotProgress"><i id="pilotProgressFill"></i></div></div></div>
+ <div class="bottom">
+  <div class="panel"><div id="throttle" class="pad" role="application" aria-label="Левый джойстик: внизу ноль, вверху шесть метров в секунду; фиксируется при отпускании"><span class="padDirection north cruiseSign" aria-hidden="true">＋</span><span class="padDirection south cruiseSign" aria-hidden="true">−</span><div class="thumb"></div></div><div class="label">КРУИЗ-КОНТРОЛЬ<br><span id="cruiseValue" class="cruiseReadout">0.0 м/с</span></div></div>
+  <div id="arrivalNotice" role="status" aria-live="assertive"><b id="arrivalTitle"></b><span id="arrivalDetail"></span></div><div id="autoDistance" aria-live="off"><span id="autoPointLabel">Автопилот</span><strong id="autoMeters">0 м</strong><small>до точки</small></div><div class="info"><div class="stat">От берега: <span id="distance">0 м</span><br>Скорость: <span id="speed">0.0 м/с</span></div><button id="reloadBait" title="Повторно загрузить прикормку у домашней точки">🌽 Загрузить прикормку</button><button id="backToBait">← Назад</button><button id="reset">↻ Начать заново</button><div class="hint">Компьютер: W/A/S/D — правый стик; ↑/↓ — круиз; пробел — выкл.</div></div>
+  <div class="panel"><div id="steer" class="pad" role="application" aria-label="Правый джойстик: вперёд сверху, назад снизу, поворот влево и вправо; около центра свободный ход для прямого курса"><span class="padDirection north">Вперёд</span><span class="padDirection south">Назад</span><span class="padDirection west">Влево</span><span class="padDirection east">Вправо</span><div class="thumb"></div></div></div>
+ </div>
+</div>
+<nav id="mainNav" aria-label="Главное меню"><button id="navSettings">⚙ Настройки</button><button id="navPoints">♧ Точки GPS</button><button id="navRoute">⌁ Маршрут</button><button id="navSave">▣ Сохранить</button><button id="navLoad">▤ Загрузить</button><button id="navRestart">↻ Начать заново</button></nav>
+<div class="remoteExtras" id="remoteExtras" aria-label="Органы управления пульта">
+ <div class="switchBox"><button id="dropLeft" class="toggleSwitch" title="Открыть левый бункер" aria-label="Открыть левый бункер"></button><span id="leftSwitchLabel">Левый бункер</span></div>
+ <div class="switchBox"><button id="dropSingle" class="toggleSwitch" title="Открыть бункер" aria-label="Открыть бункер" hidden></button><span id="singleSwitchLabel" hidden>Бункер</span></div>
+ <div class="switchBox spinnerControl"><button id="dropSpinner" type="button" aria-label="Включить вертушку" disabled>✺</button><span id="spinnerReadout">Вертушка · пусто</span></div>
+ <div class="dialBox"><div class="dial" id="navDial"></div>Габариты <span id="navPercent">0%</span><input id="navLights" type="range" min="0" max="100" value="0" aria-label="Яркость габаритных огней"></div>
+ <div class="dialBox"><div class="dial" id="headDial"></div>Фара <span id="headPercent">0%</span><input id="headLights" type="range" min="0" max="100" value="0" aria-label="Яркость центральной фары"></div>
+ <div class="switchBox"><button id="dropRight" class="toggleSwitch" title="Открыть правый бункер" aria-label="Открыть правый бункер"></button><span id="rightSwitchLabel">Правый бункер</span></div>
+</div>
+<section class="gpsPanel" id="gpsPanel" aria-label="GPS точки">
+ <header class="gpsHeading"><div class="gpsTitle">⌖ GPS · ТОЧКИ</div><button type="button" id="closeMobileGPS" aria-label="Свернуть GPS">−</button></header>
+ <div class="gpsWorkspace">
+  <div class="gpsMapBlock"><canvas class="gpsMap" id="gpsMap" width="210" height="150" aria-label="Карта озера, кораблик и сохранённые точки"></canvas><div class="gpsStatus" id="gpsStatus">H — домашняя точка · 0–30</div></div>
+  <div class="gpsActions">
+   <div class="gpsPointPicker"><button id="gpsPrev" aria-label="Предыдущая точка">−</button><div><small>ТОЧКА</small><span class="gpsNumber" id="gpsSelected">H</span></div><button id="gpsNext" aria-label="Следующая точка">+</button></div>
+   <div class="gpsActionGrid"><button id="gpsSave">▣ Записать</button><button id="gpsGo" class="primary">➤ Отправить</button><button id="gpsHome">⌂ Домой</button><button id="gpsStop">■ Стоп</button></div>
+   <div id="gpsUnload"></div>
+  </div>
+ </div>
+</section>
+<div id="premiumTelemetry" aria-label="Показания кораблика">
+ <div class="teleItem"><small>РАССТОЯНИЕ ДО ЦЕЛИ</small><strong id="hudRange">— м</strong></div>
+ <div class="teleItem"><small>СКОРОСТЬ</small><strong id="hudSpeed">0.0 м/с</strong></div>
+ <div class="teleItem"><small>РЕЖИМ</small><strong id="hudMode">РУЧНОЙ</strong></div><div class="teleItem"><small>ПУТЬ</small><strong id="hudRoute">H → —</strong></div>
+</div>
+<div class="finish" id="finish"><h2>Отличное управление!</h2><p>Вы попробовали отправить кораблик от берега и повернуть его на воде. Дальше здесь появятся сброс прикормки и подбор модели Camarad.</p><button id="again">Попробовать ещё раз</button></div>
+<div class="loading" id="loading"><div class="loadcard">
+<div id="choiceStep"><h2>🚤 Какой кораблик вы хотите?</h2><p>Выберите количество бункеров</p><div class="modelRefs"><div class="modelRef" data-count="1" role="button" tabindex="0" aria-label="Выбрать однобункерный кораблик"><img src="./boat-choice-1.png" alt="Однобункерный кораблик: один большой открытый бункер"><b>CamaraD Mono V2</b><small>Один бункер</small><button type="button">Выбрать Mono</button></div><div class="modelRef" data-count="2" role="button" tabindex="0" aria-label="Выбрать двухбункерный кораблик"><img src="./boat-choice-2.png" alt="Двухбункерный кораблик: два отдельных открытых бункера"><b>CamaraD Speed V5</b><small>Два бункера</small><button type="button">Выбрать V5</button></div></div></div>
+<div id="baitStep" hidden>
+ <div class="loadTop"><strong>Подготовка кораблика</strong><button type="button" id="clearBaits">Очистить бункеры</button><span id="choiceSummary"></span></div>
+ <div class="baitCarry"><p id="baitCarryStatus" role="status" aria-live="polite"></p><button type="button" id="cancelBait" hidden>Положить совочек</button></div>
+ <div class="loadGrid">
+  <div class="loadLeft">
+   <div class="baits"><div class="bait" data-bait="Кукуруза" data-icon="🌽"><strong>🌽</strong>Кукуруза</div><div class="bait" data-bait="Горох" data-icon="🟢"><strong>🟢</strong>Горох</div><div class="bait" data-bait="Бойлы" data-icon="🟤"><strong>🔴</strong>Бойлы</div><div class="bait" data-bait="Тигровый орех" data-icon="🥜"><strong>🥜</strong>Тигровый орех</div></div>
+   <small>Перетащите совочек в ёмкость или возьмите прикормку одним нажатием и нажмите на ёмкость.</small>
+  </div>
+  <div class="boatload" id="boatload"><img class="loadingHull" src="./boat-loading.svg" alt="Кораблик сверху: круглая вертушка впереди двух кормовых бункеров" draggable="false"><div class="boatPhoto"></div><div class="bow">НОС ▲</div>
+   <div class="hopper spinnerHopper" id="spinnerHopper" data-side="spinner"><b>ВЕРТУШКА</b><span class="contents" id="spinnerContents">Пустой</span><div class="foodLayer" id="spinnerFood"></div></div>
+   <div class="hulls" id="twoHull"><div class="hull"><div class="hopper" id="leftHopper" data-side="left"><b>ЛЕВЫЙ БУНКЕР</b><span class="contents" id="leftContents">Пустой</span><div class="foodLayer" id="leftFood"></div></div></div><div class="centerHull"></div><div class="hull"><div class="hopper" id="rightHopper" data-side="right"><b>ПРАВЫЙ БУНКЕР</b><span class="contents" id="rightContents">Пустой</span><div class="foodLayer" id="rightFood"></div></div></div></div>
+   <div class="singleHull" id="singleHull" hidden><div class="singleBody"><div class="hopper" id="singleHopper" data-side="single"><b>БУНКЕР</b><span class="contents" id="singleContents">Пустой</span><div class="foodLayer" id="singleFood"></div></div><div class="singleLogo">MONO</div></div></div>
+  </div>
+
+ </div>
+ <div class="loadActions"><button type="button" id="backChoice" class="backChoice">← Назад</button><button id="start" disabled>▶ Начать плавание</button></div>
+ <div class="reference" style="display:none"><img id="referenceBoat" alt="Модель кораблика"></div>
+</div></div></div></body></html>
