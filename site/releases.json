@@ -1,0 +1,60 @@
+{
+  "packageName": "dev.camarad.simulator",
+  "releases": [
+    {
+      "versionCode": 23,
+      "versionName": "0.23-test",
+      "channel": "testing",
+      "publishedAt": "2026-11-17",
+      "notes": [
+        "Android проверяет обновления через GitHub при запуске: «Обновить» или «Позже».",
+        "В настройках можно выбрать стабильный канал или получать также тестовые обновления.",
+        "Перед установкой проверяются SHA-256, версия, пакет и подпись APK.",
+        "На сайте доступен список версий, их тип и изменения. Игровая механика сохранена."
+      ],
+      "android": {
+        "file": "./downloads/CamaraD-0.23-test.apk",
+        "bytes": 97337905,
+        "sha256": "a481d4a9d9f983e3f73e776053e14cba42185621a2d9d013a8433bd9561ff1e8",
+        "signingCertificateSha256": "4b0bf6a486020406021b6d8f1861b098729f208d8231e1788829bd33886fc0fc"
+      },
+      "desktop": {
+        "file": "./downloads/CamaraD-0.23-test-PC.zip",
+        "bytes": 97291734,
+        "sha256": "43df79dfc7cae3fda0025a2566860380accac9ad907080636d9f7a7e34cb6207"
+      }
+    },
+    {
+      "versionCode": 22,
+      "versionName": "0.22-test",
+      "channel": "testing",
+      "publishedAt": "2026-11-17",
+      "notes": [
+        "Три размера рыбных значков эхолота и звуковой сигнал новой рыбы.",
+        "Показатели FPS, задержки, качества графики и версии.",
+        "Улучшения шрифтов, кнопок и раскладки меню."
+      ],
+      "android": {
+        "file": "./downloads/CamaraD-0.22-test.apk",
+        "bytes": 97337908,
+        "sha256": "7e27256add5455e76e14a5eeb680737f88d5d5a47a5d884050a898b14cfd1dd7",
+        "signingCertificateSha256": "4b0bf6a486020406021b6d8f1861b098729f208d8231e1788829bd33886fc0fc"
+      }
+    },
+    {
+      "versionCode": 21,
+      "versionName": "0.21-test",
+      "channel": "testing",
+      "publishedAt": "2026-11-08",
+      "notes": [
+        "Выбор игры без автоматического пропуска меню, страницы вместо прокрутки, взвешивание, полезные узлы и видимый завоз снасти."
+      ],
+      "android": {
+        "file": "./downloads/CamaraD-0.21-test.apk",
+        "bytes": 97309233,
+        "sha256": "1afd223cffa20f61209cb2610572e9646b4965c6092232c32d7da451035aebfe",
+        "signingCertificateSha256": "4b0bf6a486020406021b6d8f1861b098729f208d8231e1788829bd33886fc0fc"
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "available": true,
+  "channel": "testing",
+  "packageName": "dev.camarad.simulator",
+  "versionCode": 23,
+  "versionName": "0.23-test",
+  "releaseChannel": "testing",
+  "minSdk": 26,
+  "apkUrl": "https://raw.githubusercontent.com/nicolenkoe/CamaraD-downloads/main/site/downloads/CamaraD-0.23-test.apk",
+  "bytes": 97337905,
+  "sha256": "a481d4a9d9f983e3f73e776053e14cba42185621a2d9d013a8433bd9561ff1e8",
+  "signingCertificateSha256": "4b0bf6a486020406021b6d8f1861b098729f208d8231e1788829bd33886fc0fc",
+  "notes": "Android проверяет обновления через GitHub при запуске: «Обновить» или «Позже».\nВ настройках можно выбрать стабильный канал или получать также тестовые обновления.\nПеред установкой проверяются SHA-256, версия, пакет и подпись APK.\nНа сайте доступен список версий, их тип и изменения. Игровая механика сохранена."
+}
