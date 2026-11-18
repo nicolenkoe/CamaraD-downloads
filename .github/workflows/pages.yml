@@ -19,9 +19,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      - name: Prepare website without duplicating new release binaries
+        run: |
+          python3 - <<'PYCODE'
+          import json, shutil
+          from pathlib import Path
+          shutil.copytree('site', '_pages', ignore=shutil.ignore_patterns('downloads'))
+          # Keep pre-0.25 links working for cached older website pages.
+          # New downloads use raw GitHub URLs and stay in the public repository.
+          releases = json.loads(Path('site/releases.json').read_text())['releases']
+          external = {Path(r[k]['file']).name for r in releases if r['versionCode'] >= 25
+                      for k in ['android', 'desktop'] if r.get(k)}
+          for source in Path('site/downloads').iterdir():
+              if source.is_file() and source.name not in external:
+                  target = Path('_pages/downloads') / source.name
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(source, target)
+          assert sum(p.stat().st_size for p in Path('_pages').rglob('*') if p.is_file()) < 1_000_000_000
+          PYCODE
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: _pages
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
