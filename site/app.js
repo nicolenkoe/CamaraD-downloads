@@ -5,7 +5,7 @@ function startVideo(){video.muted=false;video.volume=1;video.play().catch(()=>{p
 playOverlay.addEventListener('click',startVideo);video.addEventListener('play',()=>playOverlay.hidden=true);video.addEventListener('ended',()=>playOverlay.hidden=false);
 
 async function load(){
- const requests=await Promise.allSettled(['release.json','site-config.json','media/chapters-v4.json'].map(async path=>{const r=await fetch('./'+path);if(!r.ok)throw Error(path);return r.json();}));
+ const requests=await Promise.allSettled(['release.json','site-config.json','media/chapters-v4.json'].map(async path=>{const r=await fetch('./'+path,{cache:'no-store'});if(!r.ok)throw Error(path);return r.json();}));
  const [release,config,chapters]=requests.map(r=>r.status==='fulfilled'?r.value:null);
  if(release){document.getElementById('currentChannel').textContent=release.channel==='stable'?'Стабильная сборка':'Тестовая сборка';document.querySelectorAll('[data-version]').forEach(e=>e.textContent=release.version);const list=document.getElementById('changes');list.replaceChildren();for(const change of release.changes){const li=document.createElement('li');li.textContent=change;list.append(li);}const date=document.getElementById('releaseDate');date.dateTime=release.date;date.textContent=new Intl.DateTimeFormat('ru',{dateStyle:'long',timeZone:'UTC'}).format(new Date(release.date+'T00:00:00Z'));}
  if(config){for(const [id,key] of [['download','download'],['play','play'],['official','officialSite']]){if(config[key]){const url=new URL(config[key],location.href);if(['https:','http:'].includes(url.protocol))document.getElementById(id).href=url.href;}}}
